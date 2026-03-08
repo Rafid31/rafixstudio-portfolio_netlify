@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rafid Khan — Graphic Designer & Visual Storyteller | Rafix Studio</title>
+  <meta name="description" content="Rafid Khan is a Dubai-based Graphic Designer with 8+ years of experience in Brand Identity, Social Media, Packaging and Motion Graphics. Founder of Rafix Studio." />
+  <meta name="keywords" content="Graphic Designer Dubai, Brand Identity, Social Media Design, Packaging Design, Motion Graphics, Rafix Studio, Rafid Khan" />
+  <meta property="og:title" content="Rafid Khan — Graphic Designer | Rafix Studio" />
+  <meta property="og:description" content="8+ years creating impactful visual identities across UAE, GCC & UK." />
+  <meta property="og:type" content="website" />
+  <link rel="stylesheet" href="styles.css" />
+  <script src="data.js" defer></script>
+  <!-- SVG Favicon: X mark -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23080810'/><text x='50%' y='50%' dominant-baseline='central' text-anchor='middle' fill='%231E5EFF' font-size='22' font-weight='bold' font-family='sans-serif'>X</text></svg>" />
+</head>
+<body>
+
+<!-- Page Transition -->
+<div class="page-transition" id="page-transition"></div>
+
+<!-- Mobile Nav Overlay -->
+<div class="nav-mobile" id="mobile-nav">
+  <button class="nav-mobile-close" id="mobile-close" aria-label="Close menu">✕</button>
+  <a href="index.html" onclick="closeMobileNav()">Home</a>
+  <a href="index.html#about" onclick="closeMobileNav()">About</a>
+  <a href="index.html#work" onclick="closeMobileNav()">Work</a>
+  <a href="projects.html" onclick="closeMobileNav()">Projects</a>
+  <a href="contact.html" onclick="closeMobileNav()">Contact</a>
+</div>
+
+<!-- Navigation -->
+<nav class="nav" id="main-nav">
+  <a class="nav-logo" href="index.html">
+    rafix<span>X</span>.studio
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html#about">About</a></li>
+    <li><a href="index.html#experience">Experience</a></li>
+    <li><a href="index.html#work">Work</a></li>
+    <li><a href="projects.html">All Projects</a></li>
+    <li><a href="contact.html" class="nav-cta">Let's Talk</a></li>
+  </ul>
+  <button class="nav-menu-btn" id="menu-btn" aria-label="Open menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════════
+     HERO SECTION
+═══════════════════════════════════════════════════════════ -->
+<section class="hero" id="home">
+  <canvas id="hero-canvas"></canvas>
+
+  <div class="container hero-inner">
+    <!-- Left: Content -->
+    <div class="hero-content">
+      <div class="hero-badge fade-in">
+        <span class="hero-badge-dot"></span>
+        <span id="hero-availability">Available for Freelance</span>
+      </div>
+
+      <h1 class="hero-name">
+        <span class="line"><span class="line-inner fade-up" data-delay="1" id="hero-name-display">Rafid Khan</span></span>
+      </h1>
+
+      <p class="hero-role fade-up" data-delay="2" id="hero-tagline">Graphic Designer &amp; Visual Storyteller</p>
+      <p class="hero-founder fade-up" data-delay="3" id="hero-founder">Founder of Rafix Studio</p>
+
+      <div class="hero-specialties fade-up" data-delay="4" id="hero-specialties"></div>
+
+      <div class="hero-actions fade-up" data-delay="5">
+        <a href="projects.html" class="btn btn-primary">View My Work →</a>
+        <a href="#" class="btn btn-outline" id="hero-resume-btn">↓ Download Resume</a>
+      </div>
+    </div>
+
+    <!-- Right: Photo -->
+    <div class="hero-photo-col fade-in" data-delay="3">
+      <div class="hero-photo-wrap">
+        <div class="hero-photo-frame" id="hero-photo-frame">
+          <!-- Photo will be injected by JS, or placeholder shown -->
+          <div class="hero-photo-placeholder" id="hero-photo-placeholder">
+            <span class="big-x">X</span>
+            <p>Add your photo in<br>Admin → Brand Settings</p>
+          </div>
+        </div>
+        <div class="hero-photo-tag">
+          <div class="stat-value">8+</div>
+          <div class="stat-label">Years Experience</div>
+        </div>
+        <div class="hero-photo-badge">
+          <span class="badge-num">50+</span>
+          <span class="badge-text">Brands</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scroll indicator -->
+  <div class="hero-scroll">
+    <span>Scroll</span>
+    <span class="hero-scroll-line"></span>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     STATS BAR
+═══════════════════════════════════════════════════════════ -->
+<div class="stats-bar">
+  <div class="container">
+    <div class="stats-bar-inner" id="stats-bar"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     ABOUT SECTION
+═══════════════════════════════════════════════════════════ -->
+<section class="section" id="about">
+  <div class="container">
+    <div class="about-grid">
+      <!-- Left: Text -->
+      <div>
+        <div class="section-label fade-up">About Me</div>
+        <h2 class="section-title fade-up" data-delay="1">
+          Designing with<br>purpose &amp; <span class="text-blue">precision.</span>
+        </h2>
+        <div style="margin-top: 2.5rem;">
+          <p class="about-text fade-up" data-delay="2" id="about-bio"></p>
+          <p class="about-text fade-up" data-delay="3" id="about-bio-extra" style="margin-top: 1.25rem; color: rgba(255,255,255,0.5);"></p>
+        </div>
+        <div class="about-details fade-up" data-delay="4">
+          <div class="about-detail">
+            <div class="about-detail-label">Based in</div>
+            <div class="about-detail-value" id="about-location">Dubai, UAE</div>
+          </div>
+          <div class="about-detail">
+            <div class="about-detail-label">Status</div>
+            <div class="about-detail-value text-blue" id="about-status">Available for Freelance</div>
+          </div>
+          <div class="about-detail">
+            <div class="about-detail-label">Education</div>
+            <div class="about-detail-value">Diploma — Design &amp; Art</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Experience Timeline -->
+      <div>
+        <div class="section-label fade-up" data-delay="1">Experience</div>
+        <div class="timeline" id="experience-timeline"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Divider -->
+<div class="container"><div class="divider"></div></div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SKILLS SECTION
+═══════════════════════════════════════════════════════════ -->
+<section class="section" id="skills">
+  <div class="container">
+    <div class="section-label fade-up">Skills &amp; Tools</div>
+    <h2 class="section-title fade-up" data-delay="1">
+      Craft meets <span class="text-blue">capability.</span>
+    </h2>
+
+    <div class="skills-grid" id="skills-grid" style="margin-top: 3rem;"></div>
+
+    <div class="section-label fade-up" style="margin-top: 3rem; margin-bottom: 1.5rem;">Software</div>
+    <div class="software-row fade-up" data-delay="1" id="software-row"></div>
+  </div>
+</section>
+
+<!-- Divider -->
+<div class="container"><div class="divider"></div></div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     FEATURED WORK SECTION
+═══════════════════════════════════════════════════════════ -->
+<section class="section" id="work">
+  <div class="container">
+    <div class="portfolio-header">
+      <div>
+        <div class="section-label fade-up">Selected Work</div>
+        <h2 class="section-title fade-up" data-delay="1">
+          Featured<br><span class="text-blue">Projects.</span>
+        </h2>
+      </div>
+      <a href="projects.html" class="btn btn-ghost fade-up" data-delay="2">
+        View All Work <span class="arrow">→</span>
+      </a>
+    </div>
+
+    <div class="portfolio-grid" id="portfolio-grid"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     CTA SECTION
+═══════════════════════════════════════════════════════════ -->
+<section class="cta-section">
+  <div class="container">
+    <p class="cta-eyebrow fade-up">Ready to Collaborate</p>
+    <h2 class="cta-title fade-up" data-delay="1">
+      Let's create something <span class="text-blue">impactful</span> together.
+    </h2>
+    <div class="cta-actions fade-up" data-delay="2">
+      <a href="contact.html" class="btn btn-primary">Start a Project</a>
+      <a href="projects.html" class="btn btn-outline">View My Work</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     FOOTER
+═══════════════════════════════════════════════════════════ -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-inner">
+      <a class="footer-logo" href="index.html">rafix<span>X</span>.studio</a>
+      <div class="footer-socials" id="footer-socials"></div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy" id="footer-copy">© 2025 Rafix Studio. All rights reserved.</p>
+      <div style="display:flex; gap:1.5rem;">
+        <a href="projects.html" style="font-size:0.75rem; color:rgba(255,255,255,0.5); transition:color 0.2s;" onmouseover="this.style.color='#1E5EFF'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">All Projects</a>
+        <a href="contact.html" style="font-size:0.75rem; color:rgba(255,255,255,0.5); transition:color 0.2s;" onmouseover="this.style.color='#1E5EFF'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">Contact</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PROJECT MODAL
+═══════════════════════════════════════════════════════════ -->
+<div class="project-modal" id="project-modal">
+  <button class="modal-close" id="modal-close" aria-label="Close">✕</button>
+  <div class="modal-inner" id="modal-inner"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SCRIPTS
+═══════════════════════════════════════════════════════════ -->
+<script>
+// Wait for data.js to load
+window.addEventListener('DOMContentLoaded', () => {
+  // data.js sets window.SITE — retry if not ready
+  if (!window.SITE) { window.SITE = SITE_DATA_DEFAULT; }
+  initSite();
+});
+
+function initSite() {
+  const S = window.SITE;
+
+  // ── Hero ──
+  document.getElementById('hero-name-display').textContent = S.brand.designerName;
+  document.getElementById('hero-tagline').textContent = S.brand.tagline;
+  document.getElementById('hero-founder').textContent = 'Founder of ' + S.brand.studioName;
+  document.getElementById('hero-availability').textContent = S.brand.availability;
+  document.title = `${S.brand.designerName} — ${S.brand.tagline} | ${S.brand.studioName}`;
+
+  // Specialties
+  const specContainer = document.getElementById('hero-specialties');
+  S.brand.specialties.forEach(s => {
+    const tag = document.createElement('span');
+    tag.className = 'hero-specialty-tag';
+    tag.textContent = s;
+    specContainer.appendChild(tag);
+  });
+
+  // Photo
+  if (S.brand.photo) {
+    const frame = document.getElementById('hero-photo-frame');
+    frame.innerHTML = `<img src="${S.brand.photo}" alt="${S.brand.designerName}" />`;
+  }
+
+  // Resume button — prefer uploaded data URL, fallback to file path
+  const resumeBtn = document.getElementById('hero-resume-btn');
+  if (S.brand.resumeDataUrl) {
+    resumeBtn.href = S.brand.resumeDataUrl;
+    resumeBtn.download = S.brand.resumeFile || 'Resume.pdf';
+  } else if (S.brand.resumeFile) {
+    resumeBtn.href = S.brand.resumeFile;
+    resumeBtn.download = S.brand.resumeFile;
+  }
+
+  // Dynamic logo
+  renderSiteLogos(S);
+
+  // ── Stats Bar ──
+  const statsBar = document.getElementById('stats-bar');
+  S.brand.stats.forEach(stat => {
+    statsBar.innerHTML += `
+      <div class="stat-item fade-up">
+        <div class="stat-num">${stat.value}</div>
+        <div class="stat-label">${stat.label}</div>
+      </div>`;
+  });
+
+  // ── About ──
+  document.getElementById('about-bio').textContent = S.brand.bio;
+  document.getElementById('about-bio-extra').textContent = S.brand.bioExtra;
+  document.getElementById('about-location').textContent = S.brand.location;
+  document.getElementById('about-status').textContent = S.brand.availability;
+
+  // ── Experience Timeline ──
+  const timeline = document.getElementById('experience-timeline');
+  S.experience.forEach((exp, i) => {
+    timeline.innerHTML += `
+      <div class="timeline-item" style="transition-delay:${i * 0.1}s">
+        <div class="timeline-dot ${exp.current ? 'current' : ''}"></div>
+        <div class="timeline-period">${exp.period}</div>
+        <div class="timeline-role">${exp.role}</div>
+        <div class="timeline-company">${exp.company}</div>
+        <span class="timeline-type">${exp.type}</span>
+        <p class="timeline-desc">${exp.description}</p>
+      </div>`;
+  });
+
+  // ── Skills ──
+  const skillsGrid = document.getElementById('skills-grid');
+  S.skills.forEach((skill, i) => {
+    skillsGrid.innerHTML += `
+      <div class="skill-card fade-up" data-delay="${(i % 3) + 1}">
+        <span class="skill-icon">${skill.icon}</span>
+        <div class="skill-name">${skill.name}</div>
+        <div class="skill-bar">
+          <div class="skill-bar-fill" data-level="${skill.level}"></div>
+        </div>
+        <div class="skill-level">${skill.level}%</div>
+      </div>`;
+  });
+
+  // Software
+  const softwareRow = document.getElementById('software-row');
+  S.software.forEach(sw => {
+    softwareRow.innerHTML += `
+      <div class="software-item">
+        <div class="software-badge" style="background:${sw.color}20; border:1px solid ${sw.color}40; color:${sw.color};">
+          ${sw.abbr}
+        </div>
+        <span class="software-name">${sw.name}</span>
+      </div>`;
+  });
+
+  // ── Featured Projects ──
+  const grid = document.getElementById('portfolio-grid');
+  const featured = S.projects.filter(p => p.featured).slice(0, 3);
+  featured.forEach((proj, i) => {
+    grid.innerHTML += buildProjectCard(proj, i);
+  });
+
+  // ── Footer ──
+  const socials = document.getElementById('footer-socials');
+  const soc = S.contact.social;
+  const socialLinks = [
+    { href: soc.instagram, label: 'IG', title: 'Instagram' },
+    { href: soc.behance,   label: 'Be', title: 'Behance' },
+    { href: soc.linkedin,  label: 'in', title: 'LinkedIn' },
+  ];
+  socialLinks.forEach(s => {
+    socials.innerHTML += `<a href="${s.href}" class="footer-social" title="${s.title}" target="_blank" rel="noopener">${s.label}</a>`;
+  });
+
+  document.getElementById('footer-copy').textContent =
+    `© ${new Date().getFullYear()} ${S.brand.studioName}. All rights reserved.`;
+
+  // ── Animate on scroll ──
+  setupScrollAnimations();
+
+  // ── Skill bars ──
+  observeSkillBars();
+}
+
+function buildProjectCard(proj, index) {
+  const delay = (index % 3) + 1;
+  const thumb = proj.cover
+    ? `<img src="${proj.cover}" alt="${proj.title}" />`
+    : `<div class="project-thumb-placeholder">X</div>`;
+  return `
+    <div class="project-card fade-up" data-delay="${delay}" onclick="openModal('${proj.id}')">
+      <div class="project-thumb">
+        ${thumb}
+        <div class="project-thumb-overlay"></div>
+        <div class="project-arrow">→</div>
+      </div>
+      <div class="project-info">
+        <div class="project-category">${proj.category}</div>
+        <div class="project-title">${proj.title}</div>
+        <div class="project-desc">${proj.description}</div>
+      </div>
+    </div>`;
+}
+
+// ── Dynamic Logo ──
+// Updates all .nav-logo and .footer-logo elements: shows uploaded image if set,
+// otherwise keeps the default text logo markup.
+function renderSiteLogos(S) {
+  const logoSrc = S && S.brand && S.brand.logo;
+  document.querySelectorAll('.nav-logo, .footer-logo').forEach(el => {
+    if (logoSrc) {
+      el.innerHTML = `<img src="${logoSrc}" alt="${S.brand.studioName}" />`;
+    } else {
+      // Restore default text logo (keep existing markup if already correct)
+      if (!el.querySelector('span')) {
+        const studioName = (S && S.brand && S.brand.studioName) || 'Rafix Studio';
+        const parts = studioName.toLowerCase().split(' ');
+        el.innerHTML = `${parts[0]}<span>X</span>.studio`;
+      }
+    }
+  });
+}
+
+// ── Modal ──
+function openModal(id) {
+  const S = window.SITE;
+  const proj = S.projects.find(p => p.id === id);
+  if (!proj) return;
+
+  const heroImg = proj.cover
+    ? `<img src="${proj.cover}" alt="${proj.title}" />`
+    : `<div class="modal-hero-placeholder">X</div>`;
+
+  const hasRealImages = proj.images && proj.images.length > 0;
+  const imgCount = hasRealImages ? proj.images.length : 2;
+  const gridClass = imgCount === 1 ? 'modal-images single-img' : imgCount === 2 ? 'modal-images two-img' : 'modal-images';
+  const extraImages = hasRealImages
+    ? proj.images.map(src => `<div class="modal-img"><img src="${src}" alt="" /></div>`).join('')
+    : `<div class="modal-img"><div class="modal-img-placeholder">Image Placeholder</div></div>
+       <div class="modal-img"><div class="modal-img-placeholder">Image Placeholder</div></div>`;
+
+  document.getElementById('modal-inner').innerHTML = `
+    <div class="modal-category">${proj.category}</div>
+    <h1 class="modal-title">${proj.title}</h1>
+    <div class="modal-meta">
+      <div class="modal-meta-item">
+        <div class="modal-meta-label">Client</div>
+        <div class="modal-meta-value">${proj.client}</div>
+      </div>
+      <div class="modal-meta-item">
+        <div class="modal-meta-label">Year</div>
+        <div class="modal-meta-value">${proj.year}</div>
+      </div>
+      <div class="modal-meta-item">
+        <div class="modal-meta-label">Category</div>
+        <div class="modal-meta-value">${proj.category}</div>
+      </div>
+      <div class="modal-meta-item">
+        <div class="modal-meta-label">Tags</div>
+        <div class="modal-meta-value">${proj.tags.join(' • ')}</div>
+      </div>
+    </div>
+    <div class="modal-hero-img">${heroImg}</div>
+    <p class="modal-story">${proj.story}</p>
+    <div class="${gridClass}">${extraImages}</div>
+    <div class="section-label" style="margin-bottom:1rem;">Tools Used</div>
+    <div class="modal-tools">
+      ${proj.tools.map(t => `<span class="modal-tool-tag">${t}</span>`).join('')}
+    </div>`;
+
+  const modal = document.getElementById('project-modal');
+  modal.classList.add('open');
+  modal.scrollTop = 0;
+  document.body.style.overflow = 'hidden';
+}
+
+document.getElementById('modal-close').addEventListener('click', () => {
+  document.getElementById('project-modal').classList.remove('open');
+  document.body.style.overflow = '';
+});
+
+document.getElementById('project-modal').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('project-modal')) {
+    document.getElementById('project-modal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+});
+
+// ── Scroll Animations ──
+function setupScrollAnimations() {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+
+  document.querySelectorAll('.fade-up, .fade-in, .timeline-item').forEach(el => {
+    observer.observe(el);
+  });
+}
+
+function observeSkillBars() {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const bar = entry.target.querySelector('.skill-bar-fill');
+        if (bar) bar.style.width = bar.dataset.level + '%';
+      }
+    });
+  }, { threshold: 0.5 });
+  document.querySelectorAll('.skill-card').forEach(el => observer.observe(el));
+}
+
+// ── Nav Scroll ──
+window.addEventListener('scroll', () => {
+  const nav = document.getElementById('main-nav');
+  nav.classList.toggle('scrolled', window.scrollY > 60);
+});
+
+// ── Mobile Nav ──
+document.getElementById('menu-btn').addEventListener('click', () => {
+  document.getElementById('mobile-nav').classList.add('open');
+  document.body.style.overflow = 'hidden';
+});
+document.getElementById('mobile-close').addEventListener('click', closeMobileNav);
+function closeMobileNav() {
+  document.getElementById('mobile-nav').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// ── Hero Canvas: Floating X Shapes ──
+(function() {
+  const canvas = document.getElementById('hero-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, particles = [];
+
+  function resize() {
+    W = canvas.width = canvas.offsetWidth;
+    H = canvas.height = canvas.offsetHeight;
+  }
+
+  class XParticle {
+    constructor() { this.reset(true); }
+    reset(init) {
+      this.x = Math.random() * W;
+      this.y = init ? Math.random() * H : H + 60;
+      this.size = 10 + Math.random() * 40;
+      this.opacity = 0.02 + Math.random() * 0.06;
+      this.speed = 0.1 + Math.random() * 0.3;
+      this.drift = (Math.random() - 0.5) * 0.2;
+      this.rotation = Math.random() * Math.PI * 2;
+      this.rotSpeed = (Math.random() - 0.5) * 0.005;
+    }
+    update() {
+      this.y -= this.speed;
+      this.x += this.drift;
+      this.rotation += this.rotSpeed;
+      if (this.y < -80) this.reset(false);
+    }
+    draw() {
+      ctx.save();
+      ctx.translate(this.x, this.y);
+      ctx.rotate(this.rotation);
+      ctx.globalAlpha = this.opacity;
+      ctx.strokeStyle = '#1E5EFF';
+      ctx.lineWidth = this.size * 0.12;
+      ctx.lineCap = 'round';
+      const s = this.size * 0.5;
+      ctx.beginPath();
+      ctx.moveTo(-s, -s); ctx.lineTo(s, s);
+      ctx.moveTo(s, -s); ctx.lineTo(-s, s);
+      ctx.stroke();
+      ctx.restore();
+    }
+  }
+
+  function init() {
+    resize();
+    particles = Array.from({length: 30}, () => new XParticle());
+  }
+
+  function loop() {
+    ctx.clearRect(0, 0, W, H);
+    particles.forEach(p => { p.update(); p.draw(); });
+    requestAnimationFrame(loop);
+  }
+
+  window.addEventListener('resize', resize);
+  init();
+  loop();
+})();
+</script>
+</body>
+</html>

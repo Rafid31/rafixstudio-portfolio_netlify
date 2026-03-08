@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — Rafix Studio CMS</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="data.js" defer></script>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23080810'/><text x='50%' y='50%' dominant-baseline='central' text-anchor='middle' fill='%231E5EFF' font-size='22' font-weight='bold' font-family='sans-serif'>X</text></svg>" />
+  <style>
+    body { background: #07070f; }
+    .admin-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .admin-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+    .admin-input-wrap { margin-bottom: 1rem; }
+    .tag-list { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; }
+    .tag-pill {
+      padding: 0.25rem 0.75rem;
+      background: rgba(30,94,255,0.1);
+      border: 1px solid rgba(30,94,255,0.3);
+      border-radius: 100px;
+      font-size: 0.75rem;
+      color: #4a7bff;
+      display: flex; align-items: center; gap: 0.5rem;
+      cursor: pointer;
+    }
+    .tag-pill span { font-size: 0.7rem; opacity: 0.6; }
+    .deploy-card {
+      padding: 1.5rem;
+      background: rgba(30,94,255,0.08);
+      border: 1px solid rgba(30,94,255,0.25);
+      border-radius: 4px;
+      margin-bottom: 1rem;
+    }
+    .deploy-card h4 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: var(--blue);
+    }
+    .deploy-card p { font-size: 0.85rem; color: rgba(255,255,255,0.6); line-height: 1.6; }
+    .deploy-card code {
+      display: block;
+      margin-top: 0.75rem;
+      padding: 0.75rem 1rem;
+      background: rgba(0,0,0,0.4);
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 0.8rem;
+      color: #4a7bff;
+      overflow-x: auto;
+    }
+    .help-tip {
+      padding: 1rem 1.25rem;
+      background: rgba(255,255,255,0.03);
+      border-left: 3px solid var(--blue);
+      border-radius: 0 4px 4px 0;
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.6);
+      line-height: 1.65;
+      margin-bottom: 1.5rem;
+    }
+    .stat-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .stat-mini {
+      padding: 1.25rem;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 4px;
+      text-align: center;
+    }
+    .stat-mini-val {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--blue);
+    }
+    .stat-mini-label { font-size: 0.7rem; color: rgba(255,255,255,0.4); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 0.25rem; }
+    @media (max-width: 768px) {
+      .admin-grid-2, .admin-grid-3 { grid-template-columns: 1fr; }
+      .stat-row { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    /* ── PASSWORD GATE ── */
+    #admin-gate {
+      position: fixed; inset: 0; background: #07070f; z-index: 9999;
+      display: flex; align-items: center; justify-content: center;
+    }
+    #admin-gate .gate-box {
+      text-align: center; max-width: 380px; width: 100%;
+      padding: 2.5rem 2rem; border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px; background: rgba(255,255,255,0.02);
+    }
+    #admin-gate .gate-logo {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.5rem; font-weight: 700; margin-bottom: 0.4rem;
+    }
+    #admin-gate .gate-logo span { color: #1E5EFF; }
+    #admin-gate .gate-subtitle {
+      font-size: 0.65rem; letter-spacing: 0.22em; text-transform: uppercase;
+      color: rgba(255,255,255,0.25); margin-bottom: 2.5rem;
+    }
+    #gate-error {
+      display: none; color: #ff6060;
+      font-size: 0.78rem; margin-top: 0.65rem; letter-spacing: 0.04em;
+    }
+    #admin-app { display: none; }
+
+    /* ── IMAGE PREVIEW ── */
+    .img-preview-box {
+      width: 100%; min-height: 110px;
+      background: rgba(255,255,255,0.03);
+      border: 1px dashed rgba(255,255,255,0.14);
+      border-radius: 4px; overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+      position: relative;
+    }
+    .img-preview-box img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .img-preview-box.has-img { border-style: solid; border-color: rgba(30,94,255,0.3); }
+    .img-preview-placeholder {
+      font-size: 0.7rem; color: rgba(255,255,255,0.18);
+      text-align: center; letter-spacing: 0.1em;
+      text-transform: uppercase; padding: 1rem;
+    }
+    .img-upload-btns { display: flex; gap: 0.4rem; margin-top: 0.5rem; }
+    .gallery-thumb-wrap { position: relative; flex-shrink: 0; }
+    .gallery-thumb {
+      width: 68px; height: 68px; border-radius: 4px;
+      object-fit: cover; display: block;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .gallery-thumb-remove {
+      position: absolute; top: -5px; right: -5px;
+      width: 16px; height: 16px; border-radius: 50%;
+      background: #ff4444; border: none; cursor: pointer;
+      font-size: 9px; color: white; display: flex;
+      align-items: center; justify-content: center;
+      line-height: 1;
+    }
+    .gallery-drop-zone {
+      display: flex; flex-wrap: wrap; gap: 0.5rem;
+      min-height: 68px; padding: 0.5rem;
+      background: rgba(255,255,255,0.02);
+      border: 1px dashed rgba(255,255,255,0.1);
+      border-radius: 4px; margin-bottom: 0.5rem;
+      align-items: center;
+    }
+    .gallery-drop-hint {
+      font-size: 0.7rem; color: rgba(255,255,255,0.18);
+      text-transform: uppercase; letter-spacing: 0.1em;
+    }
+    /* Show admin app once logged in */
+    .admin-unlocked #admin-gate { display: none; }
+    .admin-unlocked #admin-app  { display: block; }
+
+    /* PDF / file status row */
+    .file-status-row {
+      display: flex; align-items: center; gap: 0.6rem;
+      padding: 0.65rem 1rem;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 4px; min-height: 2.75rem;
+      font-size: 0.8rem; color: rgba(255,255,255,0.45);
+    }
+    .file-status-row.has-file {
+      border-color: rgba(30,94,255,0.3);
+      color: rgba(255,255,255,0.8);
+    }
+    .file-status-icon { font-size: 1rem; flex-shrink: 0; }
+    /* Logo preview box */
+    .logo-preview-box {
+      width: 100%;
+      height: 72px;
+      background: rgba(0,0,0,0.35);
+      border: 1px dashed rgba(255,255,255,0.14);
+      border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden; padding: 0.5rem;
+    }
+    .logo-preview-box img {
+      max-height: 100%; max-width: 100%;
+      object-fit: contain; display: block;
+    }
+    .logo-preview-box.has-logo { border-style: solid; border-color: rgba(30,94,255,0.3); }
+    .logo-text-demo {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.1rem; font-weight: 700; letter-spacing: -0.02em;
+    }
+    .logo-text-demo span { color: #1E5EFF; }
+  </style>
+</head>
+<body class="admin-body">
+
+<!-- ── PASSWORD GATE ───────────────────────────────────── -->
+<div id="admin-gate">
+  <div class="gate-box">
+    <div class="gate-logo">rafix<span>X</span>.studio</div>
+    <div class="gate-subtitle">Admin Access</div>
+    <input type="password" id="gate-password" class="admin-input"
+      placeholder="Enter password"
+      style="text-align:center; font-size:1rem; padding:0.875rem; letter-spacing:0.18em;"
+      onkeydown="if(event.key==='Enter') checkPassword()" autofocus />
+    <div id="gate-error">✕ Incorrect password. Please try again.</div>
+    <button onclick="checkPassword()" class="admin-btn"
+      style="width:100%; margin-top:1rem; padding:0.875rem; font-size:0.875rem; justify-content:center;">
+      Enter Admin Panel →
+    </button>
+    <p style="margin-top:2rem; font-size:0.68rem; color:rgba(255,255,255,0.18); line-height:1.7;">
+      Private access only.<br>
+      Default password: <code style="color:rgba(30,94,255,0.7);">rafix2024</code><br>
+      Change it in <code style="color:rgba(30,94,255,0.7);">data.js → admin.password</code>
+    </p>
+  </div>
+</div>
+
+<!-- ── ADMIN APP (hidden until unlocked) ─────────────── -->
+<div id="admin-app">
+
+<!-- Admin Header -->
+<div class="admin-header">
+  <div style="display:flex; align-items:center; gap:0.75rem;">
+    <span class="admin-header-logo">rafix<span>X</span>.studio</span>
+    <span class="admin-badge">CMS Admin</span>
+  </div>
+  <div style="display:flex; gap:0.75rem; align-items:center;">
+    <a href="index.html" class="admin-btn admin-btn-outline" style="text-decoration:none; font-size:0.75rem; padding:0.4rem 0.875rem;">← View Site</a>
+    <button class="admin-btn" onclick="saveAllData()" style="font-size:0.75rem; padding:0.4rem 0.875rem;">💾 Save Changes</button>
+  </div>
+</div>
+
+<!-- Admin Layout -->
+<div class="admin-layout">
+  <!-- Sidebar -->
+  <aside class="admin-sidebar">
+    <div style="margin-bottom: 1.5rem;">
+      <div style="font-size:0.65rem; letter-spacing:0.15em; text-transform:uppercase; color:rgba(255,255,255,0.3); margin-bottom:0.75rem;">Content</div>
+      <div class="admin-nav-item active" onclick="switchTab('dashboard')" id="tab-dashboard">
+        <span class="nav-icon">◈</span> Dashboard
+      </div>
+      <div class="admin-nav-item" onclick="switchTab('brand')" id="tab-brand">
+        <span class="nav-icon">✦</span> Brand &amp; Hero
+      </div>
+      <div class="admin-nav-item" onclick="switchTab('projects')" id="tab-projects">
+        <span class="nav-icon">⬡</span> Projects
+      </div>
+      <div class="admin-nav-item" onclick="switchTab('experience')" id="tab-experience">
+        <span class="nav-icon">◎</span> Experience
+      </div>
+      <div class="admin-nav-item" onclick="switchTab('contact')" id="tab-contact">
+        <span class="nav-icon">◆</span> Contact Info
+      </div>
+    </div>
+    <div>
+      <div style="font-size:0.65rem; letter-spacing:0.15em; text-transform:uppercase; color:rgba(255,255,255,0.3); margin-bottom:0.75rem;">Tools</div>
+      <div class="admin-nav-item" onclick="switchTab('deploy')" id="tab-deploy">
+        <span class="nav-icon">🚀</span> Deploy Guide
+      </div>
+      <div class="admin-nav-item" onclick="switchTab('export')" id="tab-export">
+        <span class="nav-icon">💾</span> Export / Import
+      </div>
+    </div>
+  </aside>
+
+  <!-- Content Area -->
+  <main class="admin-content" style="padding-bottom: 6rem;">
+
+    <!-- ── DASHBOARD ── -->
+    <div class="admin-section active" id="section-dashboard">
+      <div class="admin-section-title">Welcome back, Rafid 👋</div>
+      <div class="admin-section-desc">Your Rafix Studio CMS. Edit content, manage projects, and deploy your portfolio.</div>
+
+      <div class="stat-row" id="dashboard-stats"></div>
+
+      <div class="admin-card">
+        <div class="admin-card-title">Quick Links</div>
+        <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+          <a href="index.html" target="_blank" class="admin-btn admin-btn-outline" style="text-decoration:none;">🏠 View Homepage</a>
+          <a href="projects.html" target="_blank" class="admin-btn admin-btn-outline" style="text-decoration:none;">🎨 View Projects</a>
+          <a href="contact.html" target="_blank" class="admin-btn admin-btn-outline" style="text-decoration:none;">📬 View Contact</a>
+          <button onclick="switchTab('projects')" class="admin-btn">+ Add Project</button>
+        </div>
+      </div>
+
+      <div class="admin-card">
+        <div class="admin-card-title">Getting Started</div>
+        <div style="display:flex; flex-direction:column; gap:0.75rem;">
+          <div class="help-tip">
+            <strong style="color:white;">1. Add your photo</strong><br>
+            Go to <strong>Brand &amp; Hero</strong> → paste the path to your photo (e.g., <code style="color:#4a7bff;">assets/rafid-photo.jpg</code>).
+            Place the file in the <code style="color:#4a7bff;">rafix-studio/assets/</code> folder.
+          </div>
+          <div class="help-tip">
+            <strong style="color:white;">2. Upload your resume PDF</strong><br>
+            Go to <em>Brand &amp; Hero → Hero Photo &amp; Resume</em> and click "Upload PDF". Your resume is stored in the browser and served directly when visitors click Download CV.
+          </div>
+          <div class="help-tip">
+            <strong style="color:white;">3. Add your projects</strong><br>
+            Go to <strong>Projects</strong> → click <strong>Add New Project</strong> → fill in details and save.
+          </div>
+          <div class="help-tip">
+            <strong style="color:white;">4. Deploy your site</strong><br>
+            Go to <strong>Deploy Guide</strong> for free hosting options on Netlify or GitHub Pages.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── BRAND & HERO ── -->
+    <div class="admin-section" id="section-brand">
+      <div class="admin-section-title">Brand &amp; Hero Settings</div>
+      <div class="admin-section-desc">Update your name, bio, headline text, and hero photo.</div>
+
+      <!-- ── LOGO UPLOAD ── -->
+      <div class="admin-card">
+        <div class="admin-card-title">Logo</div>
+        <div class="admin-grid-2">
+          <!-- Upload side -->
+          <div class="admin-input-wrap">
+            <label class="admin-label">Logo Image (PNG / SVG / JPG)</label>
+            <div id="logo-preview-box" class="logo-preview-box">
+              <div class="img-preview-placeholder">No logo uploaded — text logo is active</div>
+            </div>
+            <input type="file" id="logo-file" accept="image/png,image/svg+xml,image/jpeg,image/webp"
+              style="display:none;" onchange="handleLogoUpload(event)" />
+            <div class="img-upload-btns" style="margin-top:0.5rem;">
+              <button class="admin-btn admin-btn-outline"
+                style="font-size:0.72rem; padding:0.35rem 0.75rem; flex:1;"
+                onclick="document.getElementById('logo-file').click()">
+                📁 Upload Logo
+              </button>
+              <button class="admin-btn admin-btn-danger"
+                style="font-size:0.72rem; padding:0.35rem 0.6rem;"
+                onclick="clearLogo()" title="Reset to text logo">✕ Clear</button>
+            </div>
+            <p style="font-size:0.68rem; color:rgba(255,255,255,0.22); margin-top:0.35rem; line-height:1.5;">
+              Recommended: white/transparent PNG or SVG, ~300×60 px.
+              Leave empty to keep the current text logo design.
+            </p>
+          </div>
+          <!-- Text logo preview side -->
+          <div>
+            <label class="admin-label">Current Text Logo (fallback)</label>
+            <div style="padding:1rem 1.25rem; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.07); border-radius:4px; margin-bottom:0.75rem;">
+              <div class="logo-text-demo">rafix<span>X</span>.studio</div>
+              <p style="font-size:0.68rem; color:rgba(255,255,255,0.25); margin-top:0.5rem;">
+                Used when no logo image is uploaded
+              </p>
+            </div>
+            <p style="font-size:0.72rem; color:rgba(255,255,255,0.4); line-height:1.6;">
+              The uploaded logo image will appear in the navigation bar and footer across all pages automatically after saving.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="admin-card">
+        <div class="admin-card-title">Identity</div>
+        <div class="admin-grid-2">
+          <div class="admin-input-wrap">
+            <label class="admin-label">Designer Name</label>
+            <input class="admin-input" id="brand-name" type="text" />
+          </div>
+          <div class="admin-input-wrap">
+            <label class="admin-label">Studio Name</label>
+            <input class="admin-input" id="brand-studio" type="text" />
+          </div>
+        </div>
+        <div class="admin-input-wrap">
+          <label class="admin-label">Hero Tagline (shown under your name)</label>
+          <input class="admin-input" id="brand-tagline" type="text" />
+        </div>
+        <div class="admin-input-wrap">
+          <label class="admin-label">Sub Tagline</label>
+          <input class="admin-input" id="brand-subtagline" type="text" />
+        </div>
+        <div class="admin-grid-2">
+          <div class="admin-input-wrap">
+            <label class="admin-label">Location</label>
+            <input class="admin-input" id="brand-location" type="text" />
+          </div>
+          <div class="admin-input-wrap">
+            <label class="admin-label">Availability Status</label>
+            <input class="admin-input" id="brand-availability" type="text" />
+          </div>
+        </div>
+      </div>
+
+      <div class="admin-card">
+        <div class="admin-card-title">Hero Photo &amp; Resume</div>
+        <div class="admin-grid-2">
+          <!-- Hero Photo Upload -->
+          <div class="admin-input-wrap">
+            <label class="admin-label">Hero Photo</label>
+            <div id="brand-photo-preview" class="img-preview-box" style="aspect-ratio:3/4; max-height:200px;">
+              <div class="img-preview-placeholder">No photo selected</div>
+            </div>
+            <!-- hidden file input -->
+            <input type="file" id="brand-photo-file" accept="image/*" style="display:none;"
+              onchange="handleHeroPhotoUpload(event)" />
+            <div class="img-upload-btns">
+              <button class="admin-btn admin-btn-outline"
+                style="font-size:0.72rem; padding:0.35rem 0.75rem; flex:1;"
+                onclick="document.getElementById('brand-photo-file').click()">
+                📁 Upload Photo
+              </button>
+              <button class="admin-btn admin-btn-danger"
+                style="font-size:0.72rem; padding:0.35rem 0.6rem;"
+                onclick="clearHeroPhoto()" title="Remove photo">✕</button>
+            </div>
+            <!-- Manual path fallback (auto-filled after upload, or type manually) -->
+            <input class="admin-input" id="brand-photo" type="text"
+              placeholder="Or type path: assets/rafid-photo.jpg"
+              style="margin-top:0.4rem; font-size:0.73rem;"
+              oninput="syncHeroPhotoPath(this.value)" />
+            <p style="font-size:0.68rem; color:rgba(255,255,255,0.22); margin-top:0.3rem; line-height:1.5;">
+              Upload stores the image in your browser. For permanent hosting, place the file in
+              <code style="color:rgba(30,94,255,0.6);">assets/uploads/</code>.
+            </p>
+          </div>
+          <!-- Resume PDF Upload -->
+          <div class="admin-input-wrap">
+            <label class="admin-label">Resume PDF</label>
+            <div id="resume-status" class="file-status-row">
+              <span id="resume-filename" style="font-size:0.8rem; color:rgba(255,255,255,0.5);">No PDF uploaded</span>
+            </div>
+            <input type="file" id="brand-resume-file" accept=".pdf" style="display:none;"
+              onchange="handleResumeUpload(event)" />
+            <div class="img-upload-btns" style="margin-top:0.5rem;">
+              <button class="admin-btn admin-btn-outline"
+                style="font-size:0.72rem; padding:0.35rem 0.75rem; flex:1;"
+                onclick="document.getElementById('brand-resume-file').click()">
+                📄 Upload PDF
+              </button>
+              <button class="admin-btn admin-btn-danger"
+                style="font-size:0.72rem; padding:0.35rem 0.6rem;"
+                onclick="clearResume()" title="Remove resume">✕</button>
+            </div>
+            <p style="font-size:0.68rem; color:rgba(255,255,255,0.22); margin-top:0.35rem; line-height:1.5;">
+              PDF is stored in your browser. The download button on the site will serve the uploaded file automatically.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="admin-card">
+        <div class="admin-card-title">Bio Text</div>
+        <div class="admin-input-wrap">
+          <label class="admin-label">Main Bio Paragraph</label>
+          <textarea class="admin-input admin-textarea" id="brand-bio" style="height:100px;"></textarea>
+        </div>
+        <div class="admin-input-wrap">
+          <label class="admin-label">Secondary Bio Paragraph</label>
+          <textarea class="admin-input admin-textarea" id="brand-bio-extra" style="height:80px;"></textarea>
+        </div>
+      </div>
+
+      <div class="admin-card">
+        <div class="admin-card-title">Specialties (Hero Tags)</div>
+        <div id="specialties-list" class="tag-list" style="margin-bottom:1rem;"></div>
+        <div style="display:flex; gap:0.75rem;">
+          <input class="admin-input" id="specialty-input" type="text" placeholder="e.g. Brand Identity" style="margin-bottom:0; flex:1;" />
+          <button class="admin-btn" onclick="addSpecialty()">Add</button>
+        </div>
+      </div>
+
+      <div class="admin-card">
+        <div class="admin-card-title">Stats (Hero Stats Bar)</div>
+        <div id="stats-list"></div>
+        <button class="admin-btn admin-btn-outline" onclick="addStat()" style="margin-top:0.5rem;">+ Add Stat</button>
+      </div>
+    </div>
+
+    <!-- ── PROJECTS ── -->
+    <div class="admin-section" id="section-projects">
+      <div class="admin-section-title">Projects</div>
+      <div class="admin-section-desc">Manage your portfolio projects. Click a project to edit, or add a new one.</div>
+
+      <div style="display:flex; justify-content:flex-end; margin-bottom:1.5rem;">
+        <button class="admin-btn" onclick="openProjectForm()">+ Add New Project</button>
+      </div>
+
+      <div class="projects-admin-list" id="projects-admin-list"></div>
+    </div>
+
+    <!-- ── EXPERIENCE ── -->
+    <div class="admin-section" id="section-experience">
+      <div class="admin-section-title">Experience Timeline</div>
+      <div class="admin-section-desc">Edit your work history. This appears on the homepage About section.</div>
+      <div id="experience-admin-list"></div>
+      <button class="admin-btn admin-btn-outline" onclick="addExperience()" style="margin-top: 1rem;">+ Add Position</button>
+    </div>
+
+    <!-- ── CONTACT INFO ── -->
+    <div class="admin-section" id="section-contact">
+      <div class="admin-section-title">Contact Information</div>
+      <div class="admin-section-desc">Update your contact details, social media links, and admin password.</div>
+
+      <div class="admin-card">
+        <div class="admin-card-title">🔒 Admin Password</div>
+        <div class="admin-grid-2">
+          <div class="admin-input-wrap">
+            <label class="admin-label">New Password</label>
+            <input class="admin-input" id="admin-password-new" type="password"
+              placeholder="Enter new password" autocomplete="new-password" />
+          </div>
+          <div class="admin-input-wrap">
+            <label class="admin-label">Confirm Password</label>
+            <input class="admin-input" id="admin-password-confirm" type="password"
+              placeholder="Repeat new password" />
+          </div>
+        </div>
+        <div style="display:flex; gap:0.75rem; align-items:center; flex-wrap:wrap;">
+          <button class="admin-btn" onclick="changeAdminPassword()" style="font-size:0.78rem;">
+            Update Password
+          </button>
+          <span id="pw-change-msg" style="font-size:0.78rem; color:#4caf50; display:none;"></span>
+        </div>
+        <p style="font-size:0.68rem; color:rgba(255,255,255,0.22); margin-top:0.75rem; line-height:1.5;">
+          Password is saved in browser storage. After changing, click <strong style="color:rgba(255,255,255,0.5);">💾 Save All Changes</strong>
+          then export <strong style="color:rgba(255,255,255,0.5);">data.js</strong> to make it permanent across devices.
+        </p>
+      </div>
+
+      <div class="admin-card">
+        <div class="admin-card-title">Direct Contact</div>
+        <div class="admin-grid-2">
+          <div class="admin-input-wrap">
+            <label class="admin-label">Email Address</label>
+            <input class="admin-input" id="contact-email" type="email" />
+          </div>
+          <div class="admin-input-wrap">
+            <label class="admin-label">Phone Number</label>
+            <input class="admin-input" id="contact-phone" type="text" />
+          </div>
+        </div>
+        <div class="admin-grid-2">
+          <div class="admin-input-wrap">
+            <label class="admin-label">WhatsApp Number (digits only)</label>
+            <input class="admin-input" id="contact-whatsapp" type="text" placeholder="971551917260" />
+          </div>
+          <div class="admin-input-wrap">
+            <label class="admin-label">Website URL</label>
+            <input class="admin-input" id="contact-website" type="text" />
+          </div>
+        </div>
+        <div class="admin-input-wrap">
+          <label class="admin-label">Formspree Form ID (optional — for contact form emails)</label>
+          <input class="admin-input" id="contact-formspree" type="text" placeholder="xpzgdabc" />
+          <p style="font-size:0.72rem; color:rgba(255,255,255,0.35); margin-top:0.35rem;">Create a free account at formspree.io → copy your form ID</p>
+        </div>
+      </div>
+
+      <div class="admin-card">
+        <div class="admin-card-title">Social Media Links</div>
+        <div class="admin-grid-2">
+          <div class="admin-input-wrap">
+            <label class="admin-label">Instagram URL</label>
+            <input class="admin-input" id="social-instagram" type="url" />
+          </div>
+          <div class="admin-input-wrap">
+            <label class="admin-label">Behance URL</label>
+            <input class="admin-input" id="social-behance" type="url" />
+          </div>
+          <div class="admin-input-wrap">
+            <label class="admin-label">LinkedIn URL</label>
+            <input class="admin-input" id="social-linkedin" type="url" />
+          </div>
+          <div class="admin-input-wrap">
+            <label class="admin-label">Facebook URL</label>
+            <input class="admin-input" id="social-facebook" type="url" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── DEPLOY GUIDE ── -->
+    <div class="admin-section" id="section-deploy">
+      <div class="admin-section-title">🚀 Deploy Your Portfolio</div>
+      <div class="admin-section-desc">Get your portfolio live on the internet — free, fast, and no coding required.</div>
+
+      <div class="deploy-card">
+        <h4>Option 1: Netlify Drop (Easiest — Recommended)</h4>
+        <p>No account needed. Just drag and drop your entire <strong>rafix-studio</strong> folder.</p>
+        <ol style="font-size:0.85rem; color:rgba(255,255,255,0.6); margin-left:1.25rem; margin-top:0.75rem; line-height:2;">
+          <li>Go to <strong style="color:white;">netlify.com/drop</strong></li>
+          <li>Drag your <strong style="color:white;">rafix-studio</strong> folder onto the page</li>
+          <li>Your site is live instantly at a random URL</li>
+          <li>Create a free Netlify account to get a custom URL like <strong style="color:#4a7bff;">rafixstudio.netlify.app</strong></li>
+        </ol>
+        <code>🌐 netlify.com/drop</code>
+      </div>
+
+      <div class="deploy-card">
+        <h4>Option 2: GitHub Pages (Free Custom Domain)</h4>
+        <p>Free hosting on GitHub with a <code style="color:white; background:none; padding:0;">username.github.io</code> URL or your own custom domain.</p>
+        <ol style="font-size:0.85rem; color:rgba(255,255,255,0.6); margin-left:1.25rem; margin-top:0.75rem; line-height:2;">
+          <li>Create a free GitHub account at <strong style="color:white;">github.com</strong></li>
+          <li>Create a repository named <strong style="color:white;">rafidkhan.github.io</strong></li>
+          <li>Upload all files from your <strong style="color:white;">rafix-studio</strong> folder</li>
+          <li>Enable GitHub Pages in Settings → Pages → Deploy from branch: main</li>
+          <li>Your site is live at <strong style="color:#4a7bff;">rafidkhan.github.io</strong></li>
+        </ol>
+        <code>🌐 github.com/new</code>
+      </div>
+
+      <div class="deploy-card">
+        <h4>Option 3: Vercel (Best Performance)</h4>
+        <p>Connect your GitHub repo to Vercel for automatic deployments on every update.</p>
+        <code>🌐 vercel.com/import</code>
+      </div>
+
+      <div class="admin-card" style="margin-top:2rem;">
+        <div class="admin-card-title">Custom Domain Setup</div>
+        <p style="font-size:0.85rem; color:rgba(255,255,255,0.6); line-height:1.7;">
+          After deploying, you can connect your own domain (like <strong style="color:white;">rafixstudio.com</strong>) from your hosting platform's settings.
+          Buy a domain from <strong style="color:white;">Namecheap</strong> or <strong style="color:white;">GoDaddy</strong>, then follow
+          the DNS configuration instructions in your Netlify/Vercel dashboard.
+        </p>
+      </div>
+
+      <div class="admin-card">
+        <div class="admin-card-title">Before You Deploy — Checklist</div>
+        <div style="display:flex; flex-direction:column; gap:0.6rem; font-size:0.85rem; color:rgba(255,255,255,0.7);">
+          <label style="display:flex; gap:0.75rem; align-items:center; cursor:pointer;"><input type="checkbox" style="accent-color:#1E5EFF;"> Added your photo to assets/ folder</label>
+          <label style="display:flex; gap:0.75rem; align-items:center; cursor:pointer;"><input type="checkbox" style="accent-color:#1E5EFF;"> Uploaded your resume PDF</label>
+          <label style="display:flex; gap:0.75rem; align-items:center; cursor:pointer;"><input type="checkbox" style="accent-color:#1E5EFF;"> Updated contact email and phone</label>
+          <label style="display:flex; gap:0.75rem; align-items:center; cursor:pointer;"><input type="checkbox" style="accent-color:#1E5EFF;"> Added social media links</label>
+          <label style="display:flex; gap:0.75rem; align-items:center; cursor:pointer;"><input type="checkbox" style="accent-color:#1E5EFF;"> Added at least 3 portfolio projects</label>
+          <label style="display:flex; gap:0.75rem; align-items:center; cursor:pointer;"><input type="checkbox" style="accent-color:#1E5EFF;"> Saved all changes (💾 button above)</label>
+          <label style="display:flex; gap:0.75rem; align-items:center; cursor:pointer;"><input type="checkbox" style="accent-color:#1E5EFF;"> Tested all pages (Home, Projects, Contact)</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── EXPORT / IMPORT ── -->
+    <div class="admin-section" id="section-export">
+      <div class="admin-section-title">Export &amp; Import Data</div>
+      <div class="admin-section-desc">Back up your CMS data or transfer it to another device.</div>
+
+      <div class="admin-card">
+        <div class="admin-card-title">Export Data</div>
+        <p style="font-size:0.85rem; color:rgba(255,255,255,0.6); margin-bottom:1rem; line-height:1.6;">
+          Export all your site data as a JSON file. Save this as a backup, or use it to update the <strong style="color:white;">data.js</strong> file directly for permanent deployment.
+        </p>
+        <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+          <button class="admin-btn" onclick="exportData()">📥 Export JSON</button>
+          <button class="admin-btn admin-btn-outline" onclick="exportDataJS()">📄 Export as data.js</button>
+        </div>
+      </div>
+
+      <div class="admin-card">
+        <div class="admin-card-title">Import Data</div>
+        <p style="font-size:0.85rem; color:rgba(255,255,255,0.6); margin-bottom:1rem; line-height:1.6;">
+          Restore data from a previously exported JSON file. This will overwrite current data.
+        </p>
+        <input type="file" id="import-file" accept=".json" style="display:none;" onchange="importData(event)" />
+        <button class="admin-btn admin-btn-outline" onclick="document.getElementById('import-file').click()">📤 Import JSON</button>
+      </div>
+
+      <div class="admin-card">
+        <div class="admin-card-title">Reset to Defaults</div>
+        <p style="font-size:0.85rem; color:rgba(255,255,255,0.6); margin-bottom:1rem; line-height:1.6;">
+          Clear all saved changes and restore the original data from <strong style="color:white;">data.js</strong>.
+        </p>
+        <button class="admin-btn admin-btn-danger" onclick="resetData()">🗑 Reset All Data</button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Save Bar -->
+<div class="admin-save-bar">
+  <span class="save-status" id="save-status">Changes not yet saved</span>
+  <div style="display:flex; gap:0.75rem;">
+    <a href="index.html" target="_blank" class="admin-btn admin-btn-outline" style="text-decoration:none; font-size:0.75rem; padding:0.5rem 1rem;">View Site</a>
+    <button class="admin-btn" onclick="saveAllData()">💾 Save All Changes</button>
+  </div>
+</div>
+
+<!-- Project Form Modal -->
+<div class="project-form-overlay" id="project-form-overlay">
+  <div class="project-form-modal">
+    <div class="project-form-title" id="project-form-title">New Project</div>
+    <input type="hidden" id="pf-id-original" />
+
+    <div class="admin-grid-2">
+      <div class="admin-input-wrap">
+        <label class="admin-label">Project Title *</label>
+        <input class="admin-input" id="pf-title" type="text" placeholder="Brand Identity System" />
+      </div>
+      <div class="admin-input-wrap">
+        <label class="admin-label">Category *</label>
+        <input class="admin-input" id="pf-category" type="text" placeholder="Branding" />
+      </div>
+    </div>
+    <div class="admin-grid-2">
+      <div class="admin-input-wrap">
+        <label class="admin-label">Client</label>
+        <input class="admin-input" id="pf-client" type="text" placeholder="Confidential" />
+      </div>
+      <div class="admin-input-wrap">
+        <label class="admin-label">Year</label>
+        <input class="admin-input" id="pf-year" type="text" placeholder="2024" />
+      </div>
+    </div>
+    <div class="admin-input-wrap">
+      <label class="admin-label">Short Description (shown on card)</label>
+      <input class="admin-input" id="pf-description" type="text" placeholder="Complete brand identity design..." />
+    </div>
+    <div class="admin-input-wrap">
+      <label class="admin-label">Project Story (shown in case study)</label>
+      <textarea class="admin-input admin-textarea" id="pf-story" style="height:100px;" placeholder="Tell the story behind this project..."></textarea>
+    </div>
+    <div class="admin-grid-2">
+      <!-- Cover Image Upload -->
+      <div class="admin-input-wrap">
+        <label class="admin-label">Cover Image</label>
+        <div id="pf-cover-preview" class="img-preview-box" style="aspect-ratio:4/3; max-height:120px;">
+          <div class="img-preview-placeholder">No cover image</div>
+        </div>
+        <input type="file" id="pf-cover-file" accept="image/*" style="display:none;"
+          onchange="handleProjectCoverUpload(event)" />
+        <div class="img-upload-btns">
+          <button class="admin-btn admin-btn-outline"
+            style="font-size:0.7rem; padding:0.3rem 0.6rem; flex:1;"
+            onclick="document.getElementById('pf-cover-file').click()">📁 Upload Cover</button>
+          <button class="admin-btn admin-btn-danger"
+            style="font-size:0.7rem; padding:0.3rem 0.5rem;"
+            onclick="clearProjectCover()">✕</button>
+        </div>
+        <input class="admin-input" id="pf-cover" type="text"
+          placeholder="Or path: assets/projects/cover.jpg"
+          style="margin-top:0.4rem; font-size:0.72rem;"
+          oninput="syncProjectCoverPath(this.value)" />
+      </div>
+      <div class="admin-input-wrap">
+        <label class="admin-label">Tools Used (comma-separated)</label>
+        <input class="admin-input" id="pf-tools" type="text" placeholder="Illustrator, Photoshop" />
+      </div>
+    </div>
+    <div class="admin-input-wrap">
+      <label class="admin-label">Tags (comma-separated)</label>
+      <input class="admin-input" id="pf-tags" type="text" placeholder="Logo, Brand Guidelines, Visual Identity" />
+    </div>
+    <!-- Gallery Images Upload -->
+    <div class="admin-input-wrap">
+      <label class="admin-label">Gallery Images (case study)</label>
+      <div class="gallery-drop-zone" id="pf-gallery-preview">
+        <span class="gallery-drop-hint">No gallery images yet</span>
+      </div>
+      <input type="file" id="pf-images-file" accept="image/*" multiple style="display:none;"
+        onchange="handleGalleryUpload(event)" />
+      <div class="img-upload-btns">
+        <button class="admin-btn admin-btn-outline"
+          style="font-size:0.7rem; padding:0.3rem 0.6rem; flex:1;"
+          onclick="document.getElementById('pf-images-file').click()">📁 Add Images (select multiple)</button>
+        <button class="admin-btn admin-btn-danger"
+          style="font-size:0.7rem; padding:0.3rem 0.5rem;"
+          onclick="clearGallery()">Clear All</button>
+      </div>
+      <!-- Hidden input keeps the data-url list for saving -->
+      <input type="hidden" id="pf-images" />
+    </div>
+    <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom: 1rem;">
+      <input type="checkbox" id="pf-featured" style="accent-color:#1E5EFF;" />
+      <label for="pf-featured" style="font-size:0.85rem; cursor:pointer;">Show as Featured Project on homepage</label>
+    </div>
+    <div class="project-form-footer">
+      <button class="admin-btn admin-btn-outline" onclick="closeProjectForm()">Cancel</button>
+      <button class="admin-btn" onclick="saveProject()">Save Project</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- /#admin-app -->
+
+<script>
+window.addEventListener('DOMContentLoaded', () => {
+  if (!window.SITE) window.SITE = SITE_DATA_DEFAULT;
+  initGate();
+});
+
+let adminData;
+
+// ── PASSWORD GATE ──────────────────────────────────────────
+function initGate() {
+  // Check if already authenticated this session
+  if (sessionStorage.getItem('rafix_admin_auth') === 'true') {
+    unlockAdmin();
+  }
+  // Auto-focus password field
+  const el = document.getElementById('gate-password');
+  if (el) setTimeout(() => el.focus(), 100);
+}
+
+function checkPassword() {
+  const input = document.getElementById('gate-password').value;
+  const correct = (window.SITE.admin && window.SITE.admin.password)
+    ? window.SITE.admin.password
+    : 'rafix2024';
+
+  if (input === correct) {
+    sessionStorage.setItem('rafix_admin_auth', 'true');
+    unlockAdmin();
+  } else {
+    const err = document.getElementById('gate-error');
+    err.style.display = 'block';
+    document.getElementById('gate-password').value = '';
+    document.getElementById('gate-password').focus();
+    // Shake animation
+    const box = document.querySelector('.gate-box');
+    box.style.animation = 'none';
+    box.style.transform = 'translateX(-8px)';
+    setTimeout(() => {
+      box.style.transform = 'translateX(8px)';
+      setTimeout(() => {
+        box.style.transform = 'translateX(0)';
+        box.style.transition = 'transform 0.15s';
+      }, 80);
+    }, 80);
+  }
+}
+
+function unlockAdmin() {
+  document.body.classList.add('admin-unlocked');
+  initAdmin();
+}
+
+// ── ADMIN INIT ─────────────────────────────────────────────
+function initAdmin() {
+  adminData = JSON.parse(JSON.stringify(window.SITE)); // deep clone
+  renderDashboard();
+  renderBrandForm();
+  renderProjectsList();
+  renderExperienceList();
+  renderContactForm();
+}
+
+// ── TABS ──
+function switchTab(tab) {
+  document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.admin-nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('section-' + tab).classList.add('active');
+  document.getElementById('tab-' + tab).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// ── DASHBOARD ──
+function renderDashboard() {
+  const stats = [
+    { val: adminData.projects.length, label: 'Projects' },
+    { val: adminData.projects.filter(p=>p.featured).length, label: 'Featured' },
+    { val: adminData.experience.length, label: 'Jobs Listed' },
+    { val: adminData.skills.length, label: 'Skills' },
+  ];
+  const row = document.getElementById('dashboard-stats');
+  row.innerHTML = stats.map(s => `
+    <div class="stat-mini">
+      <div class="stat-mini-val">${s.val}</div>
+      <div class="stat-mini-label">${s.label}</div>
+    </div>`).join('');
+}
+
+// ── BRAND FORM ──
+function renderBrandForm() {
+  const b = adminData.brand;
+  document.getElementById('brand-name').value        = b.designerName  || '';
+  document.getElementById('brand-studio').value      = b.studioName    || '';
+  document.getElementById('brand-tagline').value     = b.tagline       || '';
+  document.getElementById('brand-subtagline').value  = b.subTagline    || '';
+  document.getElementById('brand-location').value    = b.location      || '';
+  document.getElementById('brand-availability').value= b.availability  || '';
+  // resumeFile is displayed via resume-filename span (set below)
+  document.getElementById('brand-bio').value         = b.bio           || '';
+  document.getElementById('brand-bio-extra').value   = b.bioExtra      || '';
+  // Photo: show path in text field and update preview
+  const photoPath = b.photo || '';
+  document.getElementById('brand-photo').value = photoPath;
+  setImgPreview('brand-photo-preview', photoPath);
+  // Logo preview
+  setLogoPreview(b.logo || '');
+  // Resume filename display
+  const resumeFilenameEl = document.getElementById('resume-filename');
+  if (resumeFilenameEl) {
+    if (b.resumeDataUrl) {
+      resumeFilenameEl.textContent = '✓ ' + (b.resumeFile || 'Resume uploaded');
+      resumeFilenameEl.style.color = '#4caf50';
+    } else if (b.resumeFile) {
+      resumeFilenameEl.textContent = b.resumeFile;
+      resumeFilenameEl.style.color = 'rgba(255,255,255,0.5)';
+    } else {
+      resumeFilenameEl.textContent = 'No PDF uploaded';
+      resumeFilenameEl.style.color = 'rgba(255,255,255,0.5)';
+    }
+  }
+  renderSpecialties();
+  renderStats();
+}
+
+function renderSpecialties() {
+  const list = document.getElementById('specialties-list');
+  list.innerHTML = adminData.brand.specialties.map((s, i) => `
+    <span class="tag-pill" onclick="removeSpecialty(${i})">${s} <span>✕</span></span>`).join('');
+}
+function addSpecialty() {
+  const input = document.getElementById('specialty-input');
+  const val = input.value.trim();
+  if (!val) return;
+  adminData.brand.specialties.push(val);
+  input.value = '';
+  renderSpecialties();
+  markDirty();
+}
+function removeSpecialty(i) {
+  adminData.brand.specialties.splice(i, 1);
+  renderSpecialties();
+  markDirty();
+}
+
+function renderStats() {
+  const list = document.getElementById('stats-list');
+  list.innerHTML = (adminData.brand.stats || []).map((s, i) => `
+    <div style="display:grid; grid-template-columns: 100px 1fr 2rem; gap:0.5rem; align-items:center; margin-bottom:0.5rem;">
+      <input class="admin-input" style="margin:0;" value="${s.value}" oninput="updateStat(${i},'value',this.value)" placeholder="8+" />
+      <input class="admin-input" style="margin:0;" value="${s.label}" oninput="updateStat(${i},'label',this.value)" placeholder="Years Experience" />
+      <button onclick="removeStat(${i})" style="color:#ff6060; background:none; border:none; cursor:pointer; font-size:1rem;">✕</button>
+    </div>`).join('');
+}
+function updateStat(i, key, val) { adminData.brand.stats[i][key] = val; markDirty(); }
+function addStat() { adminData.brand.stats.push({ value: '0', label: 'Label' }); renderStats(); markDirty(); }
+function removeStat(i) { adminData.brand.stats.splice(i, 1); renderStats(); markDirty(); }
+
+// ── PROJECTS ──
+function renderProjectsList() {
+  const list = document.getElementById('projects-admin-list');
+  if (!adminData.projects.length) {
+    list.innerHTML = '<div style="text-align:center; padding:3rem; color:rgba(255,255,255,0.3);">No projects yet. Click "Add New Project" to get started.</div>';
+    return;
+  }
+  list.innerHTML = adminData.projects.map((p, i) => `
+    <div class="project-admin-item">
+      <div class="project-admin-info">
+        <div class="project-admin-title">${p.title} ${p.featured ? '<span style="font-size:0.65rem; color:#1E5EFF; padding:0.1rem 0.4rem; border:1px solid rgba(30,94,255,0.4); border-radius:2px; margin-left:0.5rem;">Featured</span>' : ''}</div>
+        <div class="project-admin-cat">${p.category} · ${p.year}</div>
+      </div>
+      <div class="project-admin-actions">
+        <button class="admin-btn admin-btn-outline" style="font-size:0.72rem; padding:0.35rem 0.75rem;" onclick="editProject(${i})">Edit</button>
+        <button class="admin-btn admin-btn-danger" style="font-size:0.72rem; padding:0.35rem 0.75rem;" onclick="deleteProject(${i})">Delete</button>
+      </div>
+    </div>`).join('');
+}
+
+function openProjectForm(proj, index) {
+  const overlay = document.getElementById('project-form-overlay');
+  const isEdit = proj !== undefined;
+  document.getElementById('project-form-title').textContent = isEdit ? 'Edit Project' : 'New Project';
+  document.getElementById('pf-id-original').value = isEdit ? (proj.id || '') : '';
+  document.getElementById('pf-title').value       = isEdit ? proj.title       : '';
+  document.getElementById('pf-category').value    = isEdit ? proj.category    : '';
+  document.getElementById('pf-client').value      = isEdit ? proj.client      : '';
+  document.getElementById('pf-year').value        = isEdit ? proj.year        : new Date().getFullYear();
+  document.getElementById('pf-description').value = isEdit ? proj.description : '';
+  document.getElementById('pf-story').value       = isEdit ? proj.story       : '';
+  document.getElementById('pf-tools').value       = isEdit ? (proj.tools||[]).join(', ')  : '';
+  document.getElementById('pf-tags').value        = isEdit ? (proj.tags||[]).join(', ')   : '';
+  document.getElementById('pf-featured').checked  = isEdit ? !!proj.featured  : false;
+  // Cover image
+  const coverVal = isEdit ? (proj.cover||'') : '';
+  document.getElementById('pf-cover').value = coverVal;
+  setImgPreview('pf-cover-preview', coverVal);
+  // Gallery images — load into _galleryImages temp array and render
+  const imgs = isEdit ? (proj.images||[]) : [];
+  _galleryImages = imgs.map(src => ({ src, name: '' }));
+  document.getElementById('pf-images').value = JSON.stringify(imgs);
+  renderGalleryPreview(imgs);
+  // Reset cover file input's stored dataURL
+  const cfFile = document.getElementById('pf-cover-file');
+  if (cfFile) cfFile._dataURL = null;
+  overlay.classList.add('open');
+  overlay._editIndex = isEdit ? index : null;
+}
+function closeProjectForm() {
+  document.getElementById('project-form-overlay').classList.remove('open');
+}
+function editProject(i) { openProjectForm(adminData.projects[i], i); }
+function deleteProject(i) {
+  if (!confirm(`Delete "${adminData.projects[i].title}"?`)) return;
+  adminData.projects.splice(i, 1);
+  renderProjectsList();
+  renderDashboard();
+  markDirty();
+}
+
+function saveProject() {
+  const overlay = document.getElementById('project-form-overlay');
+  const title = document.getElementById('pf-title').value.trim();
+  if (!title) { alert('Project title is required.'); return; }
+
+  const id = (document.getElementById('pf-id-original').value ||
+    title.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Date.now());
+
+  const proj = {
+    id,
+    title,
+    category:    document.getElementById('pf-category').value.trim()    || 'Design',
+    client:      document.getElementById('pf-client').value.trim()       || 'Confidential',
+    year:        document.getElementById('pf-year').value.trim()         || new Date().getFullYear().toString(),
+    description: document.getElementById('pf-description').value.trim() || '',
+    story:       document.getElementById('pf-story').value.trim()        || '',
+    cover:       (() => {
+                   const uploaded = document.getElementById('pf-cover-file') && document.getElementById('pf-cover-file')._dataURL;
+                   return uploaded || document.getElementById('pf-cover').value.trim() || '';
+                 })(),
+    tools:       document.getElementById('pf-tools').value.split(',').map(s=>s.trim()).filter(Boolean),
+    tags:        document.getElementById('pf-tags').value.split(',').map(s=>s.trim()).filter(Boolean),
+    images:      (() => { try { return JSON.parse(document.getElementById('pf-images').value || '[]'); } catch(e) { return []; } })(),
+    featured:    document.getElementById('pf-featured').checked,
+  };
+
+  if (overlay._editIndex !== null && overlay._editIndex !== undefined) {
+    adminData.projects[overlay._editIndex] = proj;
+  } else {
+    adminData.projects.push(proj);
+  }
+
+  closeProjectForm();
+  renderProjectsList();
+  renderDashboard();
+  markDirty();
+}
+
+// ── EXPERIENCE ──
+function renderExperienceList() {
+  const list = document.getElementById('experience-admin-list');
+  list.innerHTML = adminData.experience.map((exp, i) => `
+    <div class="admin-card" style="margin-bottom:1rem;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1rem;">
+        <span style="font-size:0.7rem; color:#1E5EFF; letter-spacing:0.1em; text-transform:uppercase;">Position ${i+1} ${exp.current ? '· Current' : ''}</span>
+        <div style="display:flex; gap:0.5rem;">
+          <label style="display:flex; align-items:center; gap:0.4rem; font-size:0.75rem; cursor:pointer;">
+            <input type="checkbox" ${exp.current ? 'checked' : ''} onchange="updateExp(${i},'current',this.checked)" style="accent-color:#1E5EFF;" />
+            Current Role
+          </label>
+          <button class="admin-btn admin-btn-danger" style="font-size:0.7rem; padding:0.3rem 0.6rem;" onclick="deleteExp(${i})">Remove</button>
+        </div>
+      </div>
+      <div class="admin-grid-2">
+        <div><label class="admin-label">Job Title</label>
+          <input class="admin-input" value="${exp.role}" oninput="updateExp(${i},'role',this.value)" /></div>
+        <div><label class="admin-label">Company</label>
+          <input class="admin-input" value="${exp.company}" oninput="updateExp(${i},'company',this.value)" /></div>
+      </div>
+      <div class="admin-grid-2">
+        <div><label class="admin-label">Period (e.g. Jan 2023 — Present)</label>
+          <input class="admin-input" value="${exp.period}" oninput="updateExp(${i},'period',this.value)" /></div>
+        <div><label class="admin-label">Type (Full-Time / Freelance / Remote)</label>
+          <input class="admin-input" value="${exp.type}" oninput="updateExp(${i},'type',this.value)" /></div>
+      </div>
+      <div><label class="admin-label">Description</label>
+        <textarea class="admin-input admin-textarea" style="height:80px;" oninput="updateExp(${i},'description',this.value)">${exp.description}</textarea>
+      </div>
+    </div>`).join('');
+}
+function updateExp(i, key, val) { adminData.experience[i][key] = val; markDirty(); }
+function deleteExp(i) {
+  if (!confirm('Remove this position?')) return;
+  adminData.experience.splice(i, 1);
+  renderExperienceList();
+  markDirty();
+}
+function addExperience() {
+  adminData.experience.push({ role: 'New Role', company: 'Company', type: 'Full-Time', period: '2024 — Present', description: '', current: false });
+  renderExperienceList();
+  markDirty();
+}
+
+// ── CONTACT FORM ──
+function renderContactForm() {
+  const c = adminData.contact;
+  document.getElementById('contact-email').value     = c.email      || '';
+  document.getElementById('contact-phone').value     = c.phone      || '';
+  document.getElementById('contact-whatsapp').value  = c.whatsapp   || '';
+  document.getElementById('contact-website').value   = c.website    || '';
+  document.getElementById('contact-formspree').value = c.formspreeId|| '';
+  document.getElementById('social-instagram').value  = c.social.instagram || '';
+  document.getElementById('social-behance').value    = c.social.behance   || '';
+  document.getElementById('social-linkedin').value   = c.social.linkedin  || '';
+  document.getElementById('social-facebook').value   = c.social.facebook  || '';
+}
+
+// ── SAVE ──
+function collectFormData() {
+  // Brand
+  adminData.brand.designerName  = document.getElementById('brand-name').value;
+  adminData.brand.studioName    = document.getElementById('brand-studio').value;
+  adminData.brand.tagline       = document.getElementById('brand-tagline').value;
+  adminData.brand.subTagline    = document.getElementById('brand-subtagline').value;
+  adminData.brand.location      = document.getElementById('brand-location').value;
+  adminData.brand.availability  = document.getElementById('brand-availability').value;
+  // Photo: already updated live by upload handler; also sync text field value as fallback
+  const photoTextField = document.getElementById('brand-photo').value.trim();
+  if (photoTextField && !adminData.brand.photo) adminData.brand.photo = photoTextField;
+  // resumeFile and resumeDataUrl are updated live by upload handlers — no text field to collect
+  adminData.brand.bio           = document.getElementById('brand-bio').value;
+  adminData.brand.bioExtra      = document.getElementById('brand-bio-extra').value;
+
+  // Admin password (if changed via changeAdminPassword())
+  if (adminData.admin) { /* already updated live */ }
+
+  // Contact
+  adminData.contact.email      = document.getElementById('contact-email').value;
+  adminData.contact.phone      = document.getElementById('contact-phone').value;
+  adminData.contact.whatsapp   = document.getElementById('contact-whatsapp').value;
+  adminData.contact.website    = document.getElementById('contact-website').value;
+  adminData.contact.formspreeId= document.getElementById('contact-formspree').value;
+  adminData.contact.social = {
+    instagram: document.getElementById('social-instagram').value,
+    behance:   document.getElementById('social-behance').value,
+    linkedin:  document.getElementById('social-linkedin').value,
+    facebook:  document.getElementById('social-facebook').value,
+  };
+}
+
+function saveAllData() {
+  collectFormData();
+  localStorage.setItem('rafix_site_data', JSON.stringify(adminData));
+  const status = document.getElementById('save-status');
+  status.textContent = '✓ Saved successfully — ' + new Date().toLocaleTimeString();
+  status.className = 'save-status saved';
+  setTimeout(() => {
+    status.textContent = 'All changes saved';
+    status.className = 'save-status saved';
+  }, 3000);
+}
+
+function markDirty() {
+  document.getElementById('save-status').textContent = '● Unsaved changes';
+  document.getElementById('save-status').className = 'save-status';
+}
+
+// ── EXPORT / IMPORT ──
+function exportData() {
+  collectFormData();
+  const json = JSON.stringify(adminData, null, 2);
+  download('rafix-studio-data.json', json, 'application/json');
+}
+
+function exportDataJS() {
+  collectFormData();
+  const json = JSON.stringify(adminData, null, 2);
+  const content = `// RAFIX STUDIO — SITE DATA\n// Auto-exported from Admin Panel on ${new Date().toLocaleDateString()}\n\nconst SITE_DATA_DEFAULT = ${json};\n\nfunction getSiteData() {\n  try {\n    const saved = localStorage.getItem('rafix_site_data');\n    if (saved) return JSON.parse(saved);\n  } catch(e) {}\n  return SITE_DATA_DEFAULT;\n}\n\nfunction deepMerge(base, override) {\n  const result = { ...base };\n  for (const key in override) {\n    if (override[key] && typeof override[key] === 'object' && !Array.isArray(override[key])) {\n      result[key] = deepMerge(base[key] || {}, override[key]);\n    } else {\n      result[key] = override[key];\n    }\n  }\n  return result;\n}\n\nwindow.SITE = getSiteData();\n`;
+  download('data.js', content, 'text/javascript');
+}
+
+function download(filename, content, type) {
+  const blob = new Blob([content], { type });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const imported = JSON.parse(e.target.result);
+      adminData = imported;
+      localStorage.setItem('rafix_site_data', JSON.stringify(adminData));
+      initAdmin();
+      alert('Data imported successfully!');
+    } catch(err) {
+      alert('Error reading file. Make sure it is a valid JSON export.');
+    }
+  };
+  reader.readAsText(file);
+}
+
+// ── PASSWORD CHANGE ────────────────────────────────────────
+function changeAdminPassword() {
+  const np = document.getElementById('admin-password-new').value.trim();
+  const cp = document.getElementById('admin-password-confirm').value.trim();
+  const msg = document.getElementById('pw-change-msg');
+  if (!np) { showPwMsg('Enter a new password.', '#ff6060'); return; }
+  if (np !== cp) { showPwMsg('Passwords do not match.', '#ff6060'); return; }
+  if (np.length < 4) { showPwMsg('Password too short (min 4 chars).', '#ff6060'); return; }
+  if (!adminData.admin) adminData.admin = {};
+  adminData.admin.password = np;
+  document.getElementById('admin-password-new').value = '';
+  document.getElementById('admin-password-confirm').value = '';
+  showPwMsg('✓ Password updated — click Save to apply.', '#4caf50');
+  markDirty();
+}
+function showPwMsg(text, color) {
+  const el = document.getElementById('pw-change-msg');
+  el.textContent = text; el.style.color = color; el.style.display = 'inline';
+  setTimeout(() => { el.style.display = 'none'; }, 4000);
+}
+
+// ── IMAGE UPLOAD HELPERS ────────────────────────────────────
+// Reads a File object and returns a Promise<dataURL string>
+function readFileAsDataURL(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload  = e => resolve(e.target.result);
+    reader.onerror = () => reject(new Error('File read error'));
+    reader.readAsDataURL(file);
+  });
+}
+
+// Sets an img inside a preview box, or shows placeholder if empty
+function setImgPreview(previewId, src) {
+  const box = document.getElementById(previewId);
+  if (!box) return;
+  if (src) {
+    box.innerHTML = `<img src="${src}" alt="Preview" />`;
+    box.classList.add('has-img');
+  } else {
+    box.innerHTML = '<div class="img-preview-placeholder">No image</div>';
+    box.classList.remove('has-img');
+  }
+}
+
+// ── HERO PHOTO ──
+async function handleHeroPhotoUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) {
+    alert('Image is larger than 5MB. Please compress it first for best results (recommended: under 1MB).');
+  }
+  const dataURL = await readFileAsDataURL(file);
+  adminData.brand.photo = dataURL;
+  setImgPreview('brand-photo-preview', dataURL);
+  // Show a short filename hint in the text field
+  document.getElementById('brand-photo').value = 'assets/uploads/' + file.name;
+  markDirty();
+}
+function clearHeroPhoto() {
+  adminData.brand.photo = '';
+  setImgPreview('brand-photo-preview', '');
+  document.getElementById('brand-photo').value = '';
+  document.getElementById('brand-photo-file').value = '';
+  markDirty();
+}
+function syncHeroPhotoPath(val) {
+  // If user types a path manually (not a data URL), update the data
+  if (!val.startsWith('data:')) {
+    adminData.brand.photo = val;
+    // Don't call setImgPreview with a relative path — it won't load in admin context
+  }
+  markDirty();
+}
+
+// ── LOGO ──
+async function handleLogoUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (file.size > 2 * 1024 * 1024) {
+    alert('Logo is larger than 2MB. For SVG/PNG logos this should be well under 200KB.');
+  }
+  const dataURL = await readFileAsDataURL(file);
+  adminData.brand.logo = dataURL;
+  setLogoPreview(dataURL);
+  markDirty();
+}
+function clearLogo() {
+  adminData.brand.logo = '';
+  setLogoPreview('');
+  document.getElementById('logo-file').value = '';
+  markDirty();
+}
+function setLogoPreview(src) {
+  const box = document.getElementById('logo-preview-box');
+  if (!box) return;
+  if (src) {
+    box.innerHTML = `<img src="${src}" alt="Logo Preview" style="max-height:60px; max-width:220px; object-fit:contain;" />`;
+    box.classList.add('has-img');
+  } else {
+    box.innerHTML = '<div class="img-preview-placeholder">No logo uploaded — text logo is active</div>';
+    box.classList.remove('has-img');
+  }
+}
+
+// ── RESUME PDF ──
+async function handleResumeUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (file.size > 10 * 1024 * 1024) {
+    alert('PDF is larger than 10MB. Consider compressing it first.');
+  }
+  const dataURL = await readFileAsDataURL(file);
+  adminData.brand.resumeDataUrl = dataURL;
+  adminData.brand.resumeFile = file.name;
+  const el = document.getElementById('resume-filename');
+  if (el) { el.textContent = '✓ ' + file.name; el.style.color = '#4caf50'; }
+  markDirty();
+}
+function clearResume() {
+  adminData.brand.resumeDataUrl = '';
+  adminData.brand.resumeFile = '';
+  const el = document.getElementById('resume-filename');
+  if (el) { el.textContent = 'No PDF uploaded'; el.style.color = 'rgba(255,255,255,0.5)'; }
+  const fileInput = document.getElementById('brand-resume-file');
+  if (fileInput) fileInput.value = '';
+  markDirty();
+}
+
+// ── PROJECT COVER ──
+async function handleProjectCoverUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) {
+    alert('Image is larger than 5MB. Please compress it first for best results.');
+  }
+  const dataURL = await readFileAsDataURL(file);
+  // Store in a temp variable the overlay will read when saving
+  document.getElementById('pf-cover-file')._dataURL = dataURL;
+  document.getElementById('pf-cover').value = 'assets/uploads/' + file.name;
+  setImgPreview('pf-cover-preview', dataURL);
+}
+function clearProjectCover() {
+  document.getElementById('pf-cover').value = '';
+  if (document.getElementById('pf-cover-file')) {
+    document.getElementById('pf-cover-file').value = '';
+    document.getElementById('pf-cover-file')._dataURL = null;
+  }
+  setImgPreview('pf-cover-preview', '');
+}
+function syncProjectCoverPath(val) {
+  // Manual path entry — clear any uploaded data URL
+  if (!val.startsWith('data:') && document.getElementById('pf-cover-file')) {
+    document.getElementById('pf-cover-file')._dataURL = null;
+  }
+}
+
+// ── GALLERY IMAGES ──
+let _galleryImages = []; // array of {src: dataURL|path, name: string}
+
+async function handleGalleryUpload(event) {
+  const files = Array.from(event.target.files);
+  for (const file of files) {
+    if (file.size > 5 * 1024 * 1024) {
+      alert(`"${file.name}" is over 5MB — consider compressing it.`);
+      continue;
+    }
+    const dataURL = await readFileAsDataURL(file);
+    _galleryImages.push({ src: dataURL, name: file.name });
+  }
+  event.target.value = ''; // allow re-selecting same files
+  renderGalleryPreview(_galleryImages.map(g => g.src));
+  syncGalleryHiddenInput();
+  markDirty();
+}
+
+function renderGalleryPreview(images) {
+  const zone = document.getElementById('pf-gallery-preview');
+  if (!images || images.length === 0) {
+    zone.innerHTML = '<span class="gallery-drop-hint">No gallery images yet</span>';
+    return;
+  }
+  // Support both plain string arrays (loaded from data) and _galleryImages format
+  const srcs = images.map(img => (typeof img === 'string' ? img : img.src));
+  zone.innerHTML = srcs.map((src, i) => `
+    <div class="gallery-thumb-wrap">
+      <img class="gallery-thumb" src="${src}" alt="Gallery ${i+1}" />
+      <button class="gallery-thumb-remove" onclick="removeGalleryImage(${i})" title="Remove">✕</button>
+    </div>`).join('');
+}
+
+function removeGalleryImage(index) {
+  _galleryImages.splice(index, 1);
+  renderGalleryPreview(_galleryImages.map(g => g.src));
+  syncGalleryHiddenInput();
+  markDirty();
+}
+
+function clearGallery() {
+  _galleryImages = [];
+  renderGalleryPreview([]);
+  document.getElementById('pf-images').value = '[]';
+  if (document.getElementById('pf-images-file')) document.getElementById('pf-images-file').value = '';
+  markDirty();
+}
+
+function syncGalleryHiddenInput() {
+  document.getElementById('pf-images').value = JSON.stringify(_galleryImages.map(g => g.src));
+}
+
+function resetData() {
+  if (!confirm('Reset all data to defaults? This will delete all your changes.')) return;
+  localStorage.removeItem('rafix_site_data');
+  adminData = JSON.parse(JSON.stringify(SITE_DATA_DEFAULT));
+  initAdmin();
+  markDirty();
+  alert('Data reset to defaults.');
+}
+</script>
+</body>
+</html>

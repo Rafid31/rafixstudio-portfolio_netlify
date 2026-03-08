@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>All Projects — Rafix Studio | Rafid Khan</title>
+  <meta name="description" content="Portfolio of Rafid Khan — Brand Identity, Social Media, Packaging & Motion Graphics projects by Rafix Studio." />
+  <link rel="stylesheet" href="styles.css" />
+  <script src="data.js" defer></script>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23080810'/><text x='50%' y='50%' dominant-baseline='central' text-anchor='middle' fill='%231E5EFF' font-size='22' font-weight='bold' font-family='sans-serif'>X</text></svg>" />
+</head>
+<body>
+
+<!-- Mobile Nav -->
+<div class="nav-mobile" id="mobile-nav">
+  <button class="nav-mobile-close" id="mobile-close">✕</button>
+  <a href="index.html" onclick="closeMobileNav()">Home</a>
+  <a href="index.html#about" onclick="closeMobileNav()">About</a>
+  <a href="index.html#work" onclick="closeMobileNav()">Featured Work</a>
+  <a href="projects.html" onclick="closeMobileNav()">All Projects</a>
+  <a href="contact.html" onclick="closeMobileNav()">Contact</a>
+</div>
+
+<!-- Navigation -->
+<nav class="nav scrolled" id="main-nav">
+  <a class="nav-logo" href="index.html">rafix<span>X</span>.studio</a>
+  <ul class="nav-links">
+    <li><a href="index.html#about">About</a></li>
+    <li><a href="index.html#experience">Experience</a></li>
+    <li><a href="index.html#work">Featured</a></li>
+    <li><a href="projects.html">All Projects</a></li>
+    <li><a href="contact.html" class="nav-cta">Let's Talk</a></li>
+  </ul>
+  <button class="nav-menu-btn" id="menu-btn"><span></span><span></span><span></span></button>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PROJECTS HERO
+═══════════════════════════════════════════════════════════ -->
+<div class="projects-hero">
+  <div class="container">
+    <div class="section-label fade-up">Portfolio</div>
+    <h1 class="section-title fade-up" data-delay="1" style="font-size: clamp(3rem, 7vw, 7rem); margin-bottom: 1.5rem;">
+      All<br><span class="text-blue">Projects.</span>
+    </h1>
+    <p class="fade-up" data-delay="2" style="font-size: 1.05rem; color: rgba(255,255,255,0.6); max-width: 560px; line-height: 1.75;">
+      A curated collection of brand identities, social media campaigns, packaging designs,
+      and motion graphics across UAE, GCC, and UK markets.
+    </p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     FILTERS + GRID
+═══════════════════════════════════════════════════════════ -->
+<div class="container" style="padding-bottom: clamp(5rem, 10vw, 10rem);">
+  <!-- Filters -->
+  <div class="projects-filters fade-up" id="filters-row"></div>
+
+  <!-- Count -->
+  <div style="font-size: 0.8rem; color: rgba(255,255,255,0.4); margin-bottom: 2rem; letter-spacing: 0.05em;" id="project-count"></div>
+
+  <!-- Grid -->
+  <div class="projects-full-grid" id="projects-grid"></div>
+
+  <!-- Empty state -->
+  <div id="empty-state" style="display:none; text-align:center; padding: 5rem 0; color: rgba(255,255,255,0.3);">
+    <div style="font-size:4rem; margin-bottom:1rem;">◎</div>
+    <p>No projects in this category yet.</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     CTA
+═══════════════════════════════════════════════════════════ -->
+<section class="cta-section" style="padding: clamp(4rem, 8vw, 8rem) 0;">
+  <div class="container">
+    <p class="cta-eyebrow fade-up">Have a project in mind?</p>
+    <h2 class="cta-title fade-up" data-delay="1">
+      Let's build something <span class="text-blue">great.</span>
+    </h2>
+    <div class="cta-actions fade-up" data-delay="2">
+      <a href="contact.html" class="btn btn-primary">Get in Touch</a>
+      <a href="index.html" class="btn btn-outline">← Back Home</a>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-inner">
+      <a class="footer-logo" href="index.html">rafix<span>X</span>.studio</a>
+      <div class="footer-socials" id="footer-socials"></div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy" id="footer-copy"></p>
+      <div style="display:flex; gap:1.5rem;">
+        <a href="index.html" style="font-size:0.75rem; color:rgba(255,255,255,0.5);">Home</a>
+        <a href="contact.html" style="font-size:0.75rem; color:rgba(255,255,255,0.5);">Contact</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- Project Modal -->
+<div class="project-modal" id="project-modal">
+  <button class="modal-close" id="modal-close">✕</button>
+  <div class="modal-inner" id="modal-inner"></div>
+</div>
+
+<script>
+window.addEventListener('DOMContentLoaded', () => {
+  if (!window.SITE) window.SITE = SITE_DATA_DEFAULT;
+  initProjects();
+});
+
+let currentFilter = 'All';
+const S = () => window.SITE;
+
+function renderSiteLogos(data) {
+  const logoSrc = data && data.brand && data.brand.logo;
+  document.querySelectorAll('.nav-logo, .footer-logo').forEach(el => {
+    if (logoSrc) {
+      el.innerHTML = `<img src="${logoSrc}" alt="${data.brand.studioName}" />`;
+    } else {
+      if (!el.querySelector('span')) {
+        const n = (data && data.brand && data.brand.studioName) || 'Rafix Studio';
+        el.innerHTML = `${n.toLowerCase().split(' ')[0]}<span>X</span>.studio`;
+      }
+    }
+  });
+}
+
+function initProjects() {
+  // Footer
+  buildFooter();
+  renderSiteLogos(S());
+
+  // Get categories
+  const categories = ['All', ...new Set(S().projects.map(p => p.category))];
+
+  // Build filters
+  const filtersRow = document.getElementById('filters-row');
+  categories.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className = 'filter-btn' + (cat === 'All' ? ' active' : '');
+    btn.textContent = cat;
+    btn.addEventListener('click', () => {
+      currentFilter = cat;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderProjects();
+    });
+    filtersRow.appendChild(btn);
+  });
+
+  renderProjects();
+  setupScrollAnimations();
+
+  // Nav
+  window.addEventListener('scroll', () => {
+    document.getElementById('main-nav').classList.toggle('scrolled', window.scrollY > 20);
+  });
+  document.getElementById('main-nav').classList.add('scrolled');
+}
+
+function renderProjects() {
+  const projects = currentFilter === 'All'
+    ? S().projects
+    : S().projects.filter(p => p.category === currentFilter);
+
+  const grid = document.getElementById('projects-grid');
+  const empty = document.getElementById('empty-state');
+  const count = document.getElementById('project-count');
+
+  if (projects.length === 0) {
+    grid.innerHTML = '';
+    empty.style.display = 'block';
+    count.textContent = '';
+    return;
+  }
+
+  empty.style.display = 'none';
+  count.textContent = `${projects.length} project${projects.length !== 1 ? 's' : ''}`;
+
+  grid.innerHTML = projects.map((proj, i) => {
+    const thumb = proj.cover
+      ? `<img src="${proj.cover}" alt="${proj.title}" />`
+      : `<div class="project-thumb-placeholder">X</div>`;
+    return `
+      <div class="project-card fade-up" data-delay="${(i % 3) + 1}" onclick="openModal('${proj.id}')">
+        <div class="project-thumb">
+          ${thumb}
+          <div class="project-thumb-overlay"></div>
+          <div class="project-arrow">→</div>
+        </div>
+        <div class="project-info">
+          <div class="project-category">${proj.category}</div>
+          <div class="project-title">${proj.title}</div>
+          <div class="project-desc">${proj.description}</div>
+          <div style="display:flex; gap:0.4rem; flex-wrap:wrap; margin-top:0.75rem;">
+            ${proj.tags.map(t => `<span style="font-size:0.65rem; padding:0.2rem 0.5rem; background:rgba(30,94,255,0.1); border:1px solid rgba(30,94,255,0.2); border-radius:2px; color:#4a7bff; letter-spacing:0.06em;">${t}</span>`).join('')}
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+
+  // Re-observe
+  setupScrollAnimations();
+}
+
+function openModal(id) {
+  const proj = S().projects.find(p => p.id === id);
+  if (!proj) return;
+
+  const heroImg = proj.cover
+    ? `<img src="${proj.cover}" alt="${proj.title}" />`
+    : `<div class="modal-hero-placeholder">X</div>`;
+
+  const hasRealImages = proj.images && proj.images.length > 0;
+  const imgCount = hasRealImages ? proj.images.length : 2;
+  const gridClass = imgCount === 1 ? 'modal-images single-img' : imgCount === 2 ? 'modal-images two-img' : 'modal-images';
+  const extraImages = hasRealImages
+    ? proj.images.map(src => `<div class="modal-img"><img src="${src}" alt="" /></div>`).join('')
+    : `<div class="modal-img"><div class="modal-img-placeholder">Image Placeholder</div></div>
+       <div class="modal-img"><div class="modal-img-placeholder">Image Placeholder</div></div>`;
+
+  document.getElementById('modal-inner').innerHTML = `
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.5rem;">
+      <div class="modal-category">${proj.category}</div>
+      <span style="font-size:0.7rem; color:rgba(255,255,255,0.3); letter-spacing:0.1em;">${proj.year}</span>
+    </div>
+    <h1 class="modal-title">${proj.title}</h1>
+    <div class="modal-meta">
+      <div class="modal-meta-item">
+        <div class="modal-meta-label">Client</div>
+        <div class="modal-meta-value">${proj.client}</div>
+      </div>
+      <div class="modal-meta-item">
+        <div class="modal-meta-label">Year</div>
+        <div class="modal-meta-value">${proj.year}</div>
+      </div>
+      <div class="modal-meta-item">
+        <div class="modal-meta-label">Category</div>
+        <div class="modal-meta-value">${proj.category}</div>
+      </div>
+    </div>
+    <div class="modal-hero-img">${heroImg}</div>
+    <p class="modal-story">${proj.story}</p>
+    <div class="${gridClass}">${extraImages}</div>
+    <div class="section-label" style="margin-bottom:1rem;">Tools Used</div>
+    <div class="modal-tools">
+      ${proj.tools.map(t => `<span class="modal-tool-tag">${t}</span>`).join('')}
+    </div>
+    <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.08); text-align:center;">
+      <a href="contact.html" class="btn btn-primary">Start a Similar Project →</a>
+    </div>`;
+
+  const modal = document.getElementById('project-modal');
+  modal.classList.add('open');
+  modal.scrollTop = 0;
+  document.body.style.overflow = 'hidden';
+}
+
+document.getElementById('modal-close').addEventListener('click', () => {
+  document.getElementById('project-modal').classList.remove('open');
+  document.body.style.overflow = '';
+});
+document.getElementById('project-modal').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('project-modal')) {
+    document.getElementById('project-modal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+});
+
+function buildFooter() {
+  const soc = S().contact.social;
+  const socials = document.getElementById('footer-socials');
+  [
+    { href: soc.instagram, label: 'IG' },
+    { href: soc.behance, label: 'Be' },
+    { href: soc.linkedin, label: 'in' },
+  ].forEach(s => {
+    socials.innerHTML += `<a href="${s.href}" class="footer-social" target="_blank" rel="noopener">${s.label}</a>`;
+  });
+  document.getElementById('footer-copy').textContent =
+    `© ${new Date().getFullYear()} ${S().brand.studioName}. All rights reserved.`;
+}
+
+function setupScrollAnimations() {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+  document.querySelectorAll('.fade-up, .fade-in').forEach(el => observer.observe(el));
+}
+
+// Mobile nav
+document.getElementById('menu-btn').addEventListener('click', () => {
+  document.getElementById('mobile-nav').classList.add('open');
+  document.body.style.overflow = 'hidden';
+});
+document.getElementById('mobile-close').addEventListener('click', closeMobileNav);
+function closeMobileNav() {
+  document.getElementById('mobile-nav').classList.remove('open');
+  document.body.style.overflow = '';
+}
+</script>
+</body>
+</html>
